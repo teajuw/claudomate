@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>claudomate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="logo">claudomate</h1>
+        </div>
+        <div class="header-right">
+            <div class="fleet-selector">
+                <span class="fleet-label">fleet:</span>
+                <select id="fleet-select" class="fleet-select">
+                    <option value="default">default</option>
+                </select>
+            </div>
+            <button class="header-btn" title="Settings">[settings]</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Agent Stacks -->
+        <div class="agent-grid" id="agent-grid">
+            <!-- Agents will be rendered here -->
+        </div>
+
+        <!-- Add Agent Button -->
+        <div class="add-agent-card" id="add-agent-btn">
+            <div class="add-agent-icon">[+]</div>
+            <div class="add-agent-text">add role</div>
+        </div>
+    </main>
+
+    <!-- Activity Log -->
+    <footer class="activity-log" id="activity-log">
+        <div class="activity-header">
+            <span class="activity-title">// activity_log</span>
+            <button class="activity-toggle" id="activity-toggle">[minimize]</button>
+        </div>
+        <div class="activity-content" id="activity-content">
+            <div class="activity-entry">
+                <span class="activity-time">--:--</span>
+                <span class="activity-agent">[system]</span>
+                <span class="activity-message">ready</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat Slide Panel -->
+    <div class="slide-panel" id="chat-panel">
+        <div class="panel-header">
+            <span class="panel-title" id="chat-title">Chat with AGENT</span>
+            <button class="panel-close" onclick="closeChat()">[close]</button>
+        </div>
+        <div class="panel-content">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-row">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type message...">
+                <button class="chat-send" onclick="sendChat()">[send]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Agent Modal -->
+    <div class="modal-overlay" id="add-agent-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">// add_agent</span>
+                <button class="modal-close" onclick="closeAddAgentModal()">[close]</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label">role_preset</label>
+                    <div class="preset-grid">
+                        <button class="preset-btn" data-preset="coder" onclick="selectPreset('coder')">
+                            <span class="preset-icon">&#128295;</span>
+                            <span class="preset-name">coder</span>
+                        </button>
+                        <button class="preset-btn" data-preset="reviewer" onclick="selectPreset('reviewer')">
+                            <span class="preset-icon">&#128269;</span>
+                            <span class="preset-name">reviewer</span>
+                        </button>
+                        <button class="preset-btn" data-preset="researcher" onclick="selectPreset('researcher')">
+                            <span class="preset-icon">&#128218;</span>
+                            <span class="preset-name">researcher</span>
+                        </button>
+                        <button class="preset-btn" data-preset="architect" onclick="selectPreset('architect')">
+                            <span class="preset-icon">&#127959;</span>
+                            <span class="preset-name">architect</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">agent_name</label>
+                    <input type="text" id="agent-name-input" class="form-input" placeholder="e.g., coder-1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">done_mode</label>
+                    <select id="done-mode-select" class="form-select">
+                        <option value="pr">pr - Creates PR, waits for merge</option>
+                        <option value="commit">commit - Commits directly to branch</option>
+                        <option value="draft_pr">draft_pr - Creates draft PR</option>
+                        <option value="artifact">artifact - Produces files (research, docs)</option>
+                        <option value="none">none - Manual completion</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeAddAgentModal()">[cancel]</button>
+                    <button class="btn btn-primary" onclick="createAgent()">[create]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <span class="modal-title" id="task-modal-title">// add_task</span>
+                <button class="modal-close" onclick="closeTaskModal()">[close]</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label">title</label>
+                    <input type="text" id="task-title-input" class="form-input" placeholder="e.g., Add user authentication">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">description</label>
+                    <textarea id="task-desc-input" class="form-textarea" rows="4" placeholder="Implement OAuth flow with Google..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">repo</label>
+                        <input type="text" id="task-repo-input" class="form-input" placeholder="user/repo">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">blocks</label>
+                        <input type="text" id="task-blocks-input" class="form-input" placeholder="e.g., Review auth PR">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeTaskModal()">[cancel]</button>
+                    <button class="btn btn-primary" onclick="saveTask()">[save]</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "claudomate",
+  "version": "0.1.0",
+  "description": "Mission control for Claude Code agent fleets",
+  "scripts": {
+    "dev": "npx live-server --port=3001 --open=/",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": ["claude", "agents", "automation"],
+  "author": "",
+  "license": "MIT"
+}
